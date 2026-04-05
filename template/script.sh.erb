@@ -24,7 +24,8 @@ ml
 module purge
 
 # Load the require modules
-module load <%= context.alphafold_module %>
+module load AlphaFold/2.3.2 # <%= context.alphafold_module %>
+module load AlphaFold2DB/2023-04
 
 ## Fix terminal colors for ls command with a wrapper script for system ls
 mkdir -p ~/ondemand/ood_bin
@@ -73,3 +74,4 @@ run_alphafold.py --use_gpu_relax \
 --db_preset=full_dbs \
 --output_dir=${OUTPUT} \
 --fasta_paths=${INPUT_PATH}/filename.fasta
+

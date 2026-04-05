@@ -7,8 +7,16 @@ export BC_EMAIL_ON_STARTED="<%= context.bc_email_on_started %>"
 export ACCOUNT="<%= context.account %>"
 export CREATED_AT="<%= session.created_at %>"
 export WORKINGDIR=/nesi/nobackup/${ACCOUNT}/${DIRNAME}
+export INPUT_PATH=${WORKINGDIR}/input
+export OUTPUT=${WORKINGDIR}/output
 
-source "alphafold_env.sh"
+export FASTA_FILE="${INPUT_PATH}/input.fasta"
+export JSON_FILE="${INPUT_PATH}/input.json"
 
-mkdir -p "${WORKINGDIR}" "${INPUT_DIR}" "${STRUCT}"
+#source "alphafold_env.sh"
 
+mkdir -p "${WORKINGDIR}" "${INPUT_PATH}" "${OUTPUT}"
+
+# Prepare input sequence and save to FASTA file
+echo '<%= context.protein_sequence.to_s %>' > "${FASTA_FILE}"
+echo "Debug: Created FASTA file at ${FASTA_FILE}"
