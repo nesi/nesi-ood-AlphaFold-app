@@ -22,11 +22,11 @@ attributes:
   cluster:
     widget: "select"
     options:
-      - [
-          "Kubernetes", "my-k8s-cluster",
-          data-hide-gpu: true,
-          data-set-gpu: 'none',
-        ]
+      #- [
+      #    "Kubernetes", "my-k8s-cluster",
+      #    data-hide-gpu: true,
+      #    data-set-gpu: 'none',
+      #  ]
 <% if has_slurm_apps %>
       - ["Slurm HPC", "nesi_tdc_hpc"]
     help: |
