@@ -60,7 +60,7 @@ echo "TIMING - Starting AlphaFold at: $(date)"
 INPUT_PATH=${WORKINGDIR}/input
 OUTPUT=${WORKINGDIR}/output
 
-run_alphafold.py \
+run_alphafold.py --use_gpu_relax \
 --data_dir=$AF2DB \
 --uniref90_database_path=$AF2DB/uniref90/uniref90.fasta \
 --mgnify_database_path=$AF2DB/mgnify/mgy_clusters_2022_05.fa \
@@ -73,5 +73,5 @@ run_alphafold.py \
 --max_template_date=2022-6-1 \
 --db_preset=full_dbs \
 --output_dir=${OUTPUT} \
---fasta_paths=${INPUT_PATH}/filename.fasta
+--fasta_paths=${INPUT_PATH}/input.fasta
 
