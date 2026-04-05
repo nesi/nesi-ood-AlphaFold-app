@@ -90,6 +90,27 @@ attributes:
       **WARNING**: selecting a GPU can significantly increase the time it takes for your session to start!
     display: true
 
+  protein_sequence:
+    widget: text_area
+    label: "Input Sequence"
+    help: "Enter the input sequence"
+
+  agree_terms:
+    label: "I agree to Google's Terms of Service"
+    widget: check_box
+    help: "<a href=\"https://github.com/google-deepmind/alphafold3/blob/main/WEIGHTS_TERMS_OF_USE.md\" target=\"_blank\">Read the terms</a>"
+    required: true
+
+  dirname:
+    label: "Directory"
+    help: "Output files will be saved here"
+    widget: "path_selector"
+    show_files: false
+    value: ""
+
+  bc_email_on_started:
+    label: "I would like to receive an email when the session starts and completes"
+  
 # All of the attributes that make up the Dashboard form (in respective order),
 # and made available to the submit configuration file and the template ERB
 # files
@@ -107,6 +128,10 @@ form:
   - num_cores
   - num_mem
   - gpu
+  - protein_sequence
+  - agree_terms
+  - working_directory
+  - bc_email_on_started
 description: Request a AlphaFold Server
 submit: submit.yml.erb
 title: AlphaFold
