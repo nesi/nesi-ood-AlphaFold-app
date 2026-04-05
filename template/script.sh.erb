@@ -24,7 +24,7 @@ ml
 module purge
 
 # Load the require modules
-module load <%= context.marimo_module %>
+module load <%= context.alphafold_module %>
 
 ## Fix terminal colors for ls command with a wrapper script for system ls
 mkdir -p ~/ondemand/ood_bin
@@ -56,12 +56,5 @@ echo "TIMING - Starting Marimo at: $(date)"
 # Launch the Marimo Notebook Server
 set -x
 
-# 1. Assign OOD variables (these are provided by the framework)
-# NOTE: OOD variables are typically lowercase in the ERB template
-
-marimo edit \
-  --no-token \
-  --headless \
-  --host 0.0.0.0 \
-  --port ${MARINO_PORT} \
-  --base-url /node/${host}/${PORT_CFG} 
+######################################################
+# Play around here
