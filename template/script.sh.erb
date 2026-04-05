@@ -1,0 +1,164 @@
+# Define the associative arrays for both CPU and GPU phases
+declare -A cpu_progress_table
+declare -A gpu_progress_table
+
+# Populate the arrays with pattern strings and corresponding progress values
+<% if context.session_type == "AlphaFold 2" %>
+cpu_progress_table["Started Jackhmmer (uniref90.fasta) query"]="10:Started UniRef90 search"
+cpu_progress_table["Finished Jackhmmer (uniref90.fasta) query"]="25:Completed UniRef90 search"
+cpu_progress_table["Started Jackhmmer (mgy_clusters_2022_05.fa) query"]="35:Started MGnify search"
+cpu_progress_table["Finished Jackhmmer (mgy_clusters_2022_05.fa) query"]="70:Completed MGnify search"
+cpu_progress_table["Started HHblits query"]="75:Started HHblits search"
+cpu_progress_table["Finished HHblits query"]="90:Completed HHblits search"
+cpu_progress_table["Searching for template"]="95:Searching for templates"
+cpu_progress_table["Total number of templates"]="100:Found templates"
+
+gpu_progress_table["Starting GPU job"]="0:Starting GPU job"
+gpu_progress_table["Running model model_1_multimer_v3_pred_0"]="10:Running model 1"
+gpu_progress_table["Total JAX model model_1_multimer_v3_pred_0"]="20:Completed model 1"
+gpu_progress_table["Running model model_2_multimer_v3_pred_0"]="30:Running model 2"
+gpu_progress_table["Total JAX model model_2_multimer_v3_pred_0"]="40:Completed model 2"
+gpu_progress_table["Running model model_3_multimer_v3_pred_0"]="50:Running model 3"
+gpu_progress_table["Total JAX model model_3_multimer_v3_pred_0"]="60:Completed model 3"
+gpu_progress_table["Running model model_4_multimer_v3_pred_0"]="70:Running model 4"
+gpu_progress_table["Total JAX model model_4_multimer_v3_pred_0"]="80:Completed model 4"
+gpu_progress_table["Running model model_5_multimer_v3_pred_0"]="90:Running model 5"
+gpu_progress_table["Total JAX model model_5_multimer_v3_pred_0"]="95:Completed model 5"
+gpu_progress_table["Iteration completed: Einit"]="100:GPU Completed"
+
+<% elsif context.session_type == "AlphaFold 3" %>
+
+cpu_progress_table["Detected .* JSON"]="5:Detected AlphaFold 3 input format"
+cpu_progress_table["Getting protein MSAs for sequence .*"]="10:Getting protein MSAs"
+cpu_progress_table["Query sequence: .*"]="12:Started Jackhmmer search"
+cpu_progress_table["Launching subprocess \"/hmmer/bin/jackhmmer.*bfd-first_non_consensus_sequences.fasta\""]="13:Started BFD search"
+cpu_progress_table["Launching subprocess \"/hmmer/bin/jackhmmer.*uniref90_2022_05.fa\""]="14:Started UniRef90 search"
+cpu_progress_table["Launching subprocess \"/hmmer/bin/jackhmmer.*uniprot_all_2021_04.fa\""]="15:Started UniProt search"
+cpu_progress_table["Launching subprocess \"/hmmer/bin/jackhmmer.*mgy_clusters_2022_05.fa\""]="16:Started MGnify search"
+cpu_progress_table["Finished Jackhmmer.*bfd-first_non_consensus_sequences.fasta.*seconds"]="30:Completed BFD search"
+cpu_progress_table["Finished Jackhmmer.*uniref90_2022_05.fa.*seconds"]="45:Completed UniRef90 search"
+cpu_progress_table["Finished Jackhmmer.*uniprot_all_2021_04.fa.*seconds"]="60:Completed UniProt search"
+cpu_progress_table["Finished Jackhmmer.*mgy_clusters_2022_05.fa.*seconds"]="75:Completed MGnify search"
+cpu_progress_table["Getting protein MSAs took .* seconds"]="80:Completed all MSA searches"
+cpu_progress_table["Deduplicating MSAs for sequence .*"]="85:Deduplicating MSAs"
+cpu_progress_table["Getting protein templates for sequence .*"]="90:Getting protein templates"
+cpu_progress_table["Finished Hmmbuild in .* seconds"]="92:Building HMM"
+cpu_progress_table["Finished Hmmsearch in .* seconds"]="95:Searching HMM"
+cpu_progress_table["Getting protein templates took .* seconds"]="97:Completed template search"
+cpu_progress_table["Processing chain .*"]="98:Processing chain"
+cpu_progress_table["Writing model input JSON"]="99:Writing model input JSON"
+cpu_progress_table["Done processing fold input"]="100:Done processing fold input"
+
+gpu_progress_table["Starting GPU job"]="0:Starting GPU job"
+gpu_progress_table["Unable to initialize backend 'rocm'"]="1:Unable to initialize ROCm backend"
+gpu_progress_table["Unable to initialize backend 'tpu'"]="2:Unable to initialize TPU backend"
+gpu_progress_table["Detected .* JSON"]="5:Detected AlphaFold 3 input format"
+gpu_progress_table["processing .* random_seed"]="10:Processing fold input"
+gpu_progress_table["Calculating bucket size for input with .* tokens"]="15:Calculating bucket size"
+gpu_progress_table["Got bucket size .* for input with .* tokens"]="20:Got bucket size"
+gpu_progress_table["Found local devices"]="25:Found local devices"
+gpu_progress_table["Building model from scratch"]="30:Building model from scratch"
+gpu_progress_table["Checking that model parameters can be loaded"]="35:Checking model parameters"
+gpu_progress_table["Predicting 3D structure for .* with .* seed"]="40:Predicting 3D structure"
+gpu_progress_table["Featurising data with .* seed"]="45:Featurising data"
+gpu_progress_table["Featurising data with seed .*"]="50:Featurising specific seed"
+gpu_progress_table["Featurising data with seed .* took .* seconds"]="55:Completed featurisation"
+gpu_progress_table["Running model inference with seed .*"]="60:Running model inference"
+gpu_progress_table["Running model inference with seed .* took .* seconds"]="70:Completed model inference"
+gpu_progress_table["Extracting inference results with seed .*"]="75:Extracting results"
+gpu_progress_table["Extracting .* inference samples with seed .* took .* seconds"]="85:Completed extraction"
+gpu_progress_table["Writing outputs with .* seed"]="90:Writing outputs"
+gpu_progress_table["Fold job .* done, output written to"]="100:GPU Phase Completed"
+<% end %>
+
+# Function to update job_status.json
+update_status() {
+    local progress=$1
+    local output=$2
+    local phase=$3
+    shift 3
+    local detail=("$@")
+
+    if [ ${#detail[@]} -eq 0 ]; then
+        detail_json="[]"
+    else
+        detail_json="["
+        for item in "${detail[@]}"; do
+            detail_json+="\"$item\","
+        done
+        detail_json="${detail_json%,}]"  # Remove the trailing comma and close the array
+    fi
+
+    echo "{\"progress\": \"$progress\", \"status\": \"$output\", \"phase\": \"$phase\", \"detail\": $detail_json}" | tee ${STATUS_FILE}
+}
+
+# Function to monitor log files and terminate when the SLURM job ends
+monitor_log() {
+    local logfile=$1
+    local job_id=$2
+    local phase=$3
+    local -n progress_table=$4
+
+    update_status 0 "Initializing job..." "$phase"
+
+    declare -A matched_patterns
+    local ordered_patterns=()
+
+    while true; do
+        local last_progress=""
+        local last_output=""
+
+        # Read the entire log file
+        while IFS= read -r line; do
+            for pattern in "${!progress_table[@]}"; do
+                if echo "$line" | grep -q "$pattern"; then
+                    IFS=':' read -r progress output <<< "${progress_table[$pattern]}"
+                    last_progress=$progress
+                    last_output=$output
+                    if [ -z "${matched_patterns[$output]}" ]; then
+                        matched_patterns["$output"]=1
+                        ordered_patterns+=("$output")
+                    fi
+                fi
+            done
+        done < $logfile
+
+        # Update status with the last matched state and prior matched states
+        if [[ -n $last_progress && -n $last_output ]]; then
+            update_status "$last_progress" "$last_output" "$phase" "${ordered_patterns[@]}"
+        fi
+
+        # Check if the SLURM job is still running
+        job_state=$(squeue -j $job_id -h -o %t)
+        if [ "$job_state" != "R" ]; then
+            echo "SLURM job $job_id is no longer running"
+            break
+        fi
+
+        sleep 5  # Check every 5 seconds
+    done
+}
+
+# Function to wait for SLURM job to start and log file to be created
+wait_for_job_and_log() {
+    local job_id=$1
+    local logfile=$2
+
+    update_status 0 "Waiting for job $job_id to start..." "Initializing"
+    while ! squeue -j $job_id > /dev/null 2>&1; do
+        sleep 5
+    done
+
+    echo "Waiting for log file $logfile to be created..."
+    while [ ! -f $logfile ]; do
+        sleep 5
+    done
+}
+
+# Wait for CPU job to start and log file to be created, then monitor CPU phase
+wait_for_job_and_log $CPU_JOB_ID $CPU_LOG_FILE
+monitor_log $CPU_LOG_FILE $CPU_JOB_ID "$SESSION_TYPE CPU Phase - MSA Generation" cpu_progress_table
+
+# Wait for GPU job to start and log file to be created, then monitor GPU phase after CPU phase is complete
+wait_for_job_and_log $GPU_JOB_ID $GPU_LOG_FILE
+monitor_log $GPU_LOG_FILE $GPU_JOB_ID "$SESSION_TYPE GPU Phase - Structure Prediction" gpu_progress_table

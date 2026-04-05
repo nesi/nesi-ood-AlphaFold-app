@@ -1,0 +1,37 @@
+# This script (`before.sh.erb`) is sourced directly into the main Bash script
+# that is run when the batch job starts up. It is called before the `script.sh`
+# is forked off into a separate process.
+
+export WORKINGDIR="<%= context.working_directory %>"
+export BC_EMAIL_ON_STARTED="<%= context.bc_email_on_started %>"
+export SESSION_TYPE="<%= context.session_type %>"
+export CREATED_AT="<%= session.created_at %>"
+
+source "alphafold_env.sh"
+
+mkdir -p "${WORKINGDIR}" "${INPUT_DIR}" "${STRUCT}"
+
+<% if context.bc_email_on_started == "1" %>
+# Add all emails if checked
+scontrol update jobid=$SLURM_JOBID MailType=ALL
+<% end %>
+
+<%- if context.session_type == "AlphaFold 2" -%>
+# AlphaFold 2
+
+# Prepare input sequence and save to FASTA file
+echo '<%= context.protein_sequence.to_s %>' > "${FASTA_FILE}"
+echo "Debug: Created FASTA file at ${FASTA_FILE}"
+
+echo "Starting AlphaFold 2 process"
+source ./alphafold.sh "${FASTA_FILE}" "$WORKINGDIR" "<%= context.auto_accounts %>" "<%= context.auto_queues %>" "$STATUS_FILE"
+
+<%- elsif context.session_type == "AlphaFold 3" -%>
+
+echo '<%= context.protein_sequence.to_s %>' > "${JSON_FILE}"
+echo "Debug: Created JSON input file at ${JSON_FILE}"
+
+echo "Starting AlphaFold 3 process"
+source ./alphafold3.sh "${JSON_FILE}" "$WORKINGDIR" "<%= context.auto_accounts %>" "<%= context.auto_queues %>" "$STATUS_FILE"
+
+<%- end -%>

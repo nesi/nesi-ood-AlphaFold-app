@@ -1,0 +1,112 @@
+<%-
+  groups = OodSupport::User.new.groups.sort_by(&:id).tap { |groups|
+    groups.unshift(groups.delete(OodSupport::Process.group))
+  }.map(&:name).grep(/.*[0-9]{5}/)
+
+  all_groups = OodSupport::User.new.groups.sort_by(&:id).tap { |groups|
+    groups.unshift(groups.delete(OodSupport::Process.group))
+  }.map(&:name)
+  has_slurm_apps = all_groups.include?("nesi-staff") || all_groups.include?("ondemand-slurm-apps")
+-%>
+
+# Batch Connect app configuration file
+#
+# @note Used to define the submitted cluster, title, description, and
+#   hard-coded/user-defined attributes that make up this Batch Connect app.
+---
+# Define attribute values that aren't meant to be modified by the user within
+# the Dashboard form
+attributes:
+
+  # select the cluster
+  cluster:
+    widget: "select"
+    options:
+      - [
+          "Kubernetes", "my-k8s-cluster",
+          data-hide-gpu: true,
+          data-set-gpu: 'none',
+        ]
+<% if has_slurm_apps %>
+      - ["Slurm HPC", "nesi_tdc_hpc"]
+    help: |
+      Kubernetes jobs are more likely to start promptly - "Slurm HPC" jobs may have to wait in the queue.
+      If you need GPUs then you must choose "Slurm HPC" currently.
+<% end %>
+    cacheable: false  # we always want k8s at the top?
+
+  # allow user to choose which Marimo module is loaded
+  alphafold_module:
+    widget: select
+    label: "AlphaFold module"
+    options:
+      - [ "AlphaFold/3.0.1", "AlphaFold/3.0.1" ]
+      - [ "AlphaFold/3.0.0", "AlphaFold/3.0.0" ]
+      - [ "AlphaFold/2.3.2", "AlphaFold/2.3.2" ]
+    cacheable: false  # default to latest (first in list)
+
+  account:
+    label: "Project Code"
+    widget: select
+    options:
+      <%- groups.each do |group| %>
+      - "<%= group %>"
+      <%- end %>
+    required: true
+    display: true
+
+  bc_num_hours:
+    max: 24
+    min: 1
+    step: 1
+    value: 1
+    widget: number_field
+
+  num_cores:
+    label: Number of cores
+    min: 1
+    value: 2
+    max: 4
+    widget: number_field
+    display: true
+
+  num_mem:
+    label: Memory per job (GB)
+    max: 32
+    min: 4
+    step: 1
+    value: 4
+    widget: number_field
+    display: true
+
+  gpu:
+    label: GPU
+    widget: select
+    options:
+      - 'none'
+      - [ "L4 (24 GB VRAM, aimed at AI workloads, up to single precision)", 'L4' ]
+      - [ "H100 (96 GB VRAM, recommend submitting as Slurm jobs due to potential wait times)", "H100" ]
+    help: |
+      **WARNING**: selecting a GPU can significantly increase the time it takes for your session to start!
+    display: true
+
+# All of the attributes that make up the Dashboard form (in respective order),
+# and made available to the submit configuration file and the template ERB
+# files
+#
+# @note You typically do not need to modify this unless you want to add a new
+#   configurable value
+# @note If an attribute listed below is hard-coded above in the `attributes`
+#   option, then it will not appear in the form page that the user sees in the
+#   Dashboard
+form:
+  - cluster
+  - account
+  - alphafold_module
+  - bc_num_hours
+  - num_cores
+  - num_mem
+  - gpu
+description: Request a AlphaFold Server
+submit: submit.yml.erb
+title: AlphaFold
