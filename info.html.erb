@@ -1,0 +1,83 @@
+<% require 'json' %>
+
+<% 
+status_data = {}
+
+# Check if connection.yml file exists (connect API)
+if staged_root && File.exist?(staged_root.join('connection.yml')) 
+  cpu_job_id = connect.CPU_JOB_ID
+  gpu_job_id = connect.GPU_JOB_ID
+  run_dir = connect.RUN_DIR
+  input_dir = connect.INPUT_DIR
+  struct = connect.STRUCT
+  logdir = connect.LOGDIR
+  cpu_log_file = connect.CPU_LOG_FILE
+  gpu_log_file = connect.GPU_LOG_FILE
+
+  # Read status.json file
+  status_file = File.join(staged_root, connect.STATUS_FILE || "")
+  status_data = JSON.parse(File.read(status_file)) if File.exist?(status_file)
+end
+
+# Extract information from status_data
+if status_data
+  progress = status_data['progress'] || 0
+  status = status_data['status'] || "Unknown"
+  phase = status_data['phase'] || "Unknown"
+  details = status_data['detail'] || []
+  details_html = details.compact.map { |detail| "<li>#{detail}</li>" }.join
+end
+%>
+
+<%- if status_file && File.exist?(status_file) -%>
+  <h5>Current Status</h5>
+  <p><strong>Job IDs:</strong> CPU = <%= cpu_job_id %> | GPU = <%= gpu_job_id %> 
+    <a href="/pun/sys/dashboard/activejobs?jobcluster=all&jobfilter=user">View My Jobs <i class="fa fa-external-link"></i></a>
+  </p>
+  <p><strong>Run Directory:</strong> 
+    <a href="/pun/sys/dashboard/files/fs<%= run_dir %>" target="_blank">
+      <%= run_dir %>
+      <i class="fa fa-external-link"></i>
+    </a>
+  </p>
+  <p><strong>Phase:</strong> <%= phase %></p>
+  <p><strong>Step:</strong> <%= status %></p>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100">
+      <%= progress %>%
+    </div>
+  </div>
+
+<%- if details.any? -%>
+  <h6>Progress:</h6>
+  <ul>
+    <%= details_html.html_safe %>
+  </ul>
+<%- end -%>
+<%- end -%>
+
+<%- if cpu_log_file && File.exist?(cpu_log_file) -%>
+<% escaped_cpu_log = File.read(cpu_log_file).lines.map { |line| line.start_with?('#') ? "\\#{line}" : line }.join %>
+  <h6>
+    <a href="/pun/sys/dashboard/files/fs<%= cpu_log_file %>" target="_blank">
+      CPU Phase Log
+      <i class="fa fa-external-link"></i>
+    </a>
+  </h6>
+  <div style="max-height: 300px; overflow: auto; border: 1px solid #ddd; padding: 10px;">
+    <pre style="white-space: pre; overflow-x: auto; font-size: 12px;"><%= escaped_cpu_log %></pre>
+  </div>
+<%- end -%>
+
+<%- if gpu_log_file && File.exist?(gpu_log_file) -%>
+<% escaped_gpu_log = File.read(gpu_log_file).lines.map { |line| line.start_with?('#') ? "\\#{line}" : line }.join %>
+  <h6>
+    <a href="/pun/sys/dashboard/files/fs<%= gpu_log_file %>" target="_blank">
+      GPU Phase Log
+      <i class="fa fa-external-link"></i>
+    </a>
+  </h6>
+  <div style="max-height: 300px; overflow: auto; border: 1px solid #ddd; padding: 10px;">
+    <pre style="white-space: pre; overflow-x: auto; font-size: 12px;"><%= escaped_gpu_log %></pre>
+  </div>
+<%- end -%>
