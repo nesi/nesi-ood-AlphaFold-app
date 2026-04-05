@@ -2,10 +2,11 @@
 # that is run when the batch job starts up. It is called before the `script.sh`
 # is forked off into a separate process.
 
-export WORKINGDIR="<%= context.working_directory %>"
+export DIRNAME="<%= context.dirname %>"
 export BC_EMAIL_ON_STARTED="<%= context.bc_email_on_started %>"
-export SESSION_TYPE="<%= context.session_type %>"
+export ACCOUNT="<%= context.account %>"
 export CREATED_AT="<%= session.created_at %>"
+export WORKINGDIR=/nesi/nobackup/${ACCOUNT}/${DIRNAME}
 
 source "alphafold_env.sh"
 
