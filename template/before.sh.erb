@@ -15,6 +15,6 @@ export JSON_FILE="${INPUT_PATH}/input.json"
 
 mkdir -p "${WORKINGDIR}" "${INPUT_PATH}" "${OUTPUT}"
 
-# Prepare input sequence and save to FASTA file
-echo '<%= context.protein_sequence.to_s %>' > "${FASTA_FILE}"
-echo "Debug: Created FASTA file at ${FASTA_FILE}"
+# Prepare input sequence and save to JSON file
+echo '<%= context.protein_sequence.to_s %>' > "${JSON_FILE}"
+echo "Debug: Created JSON file at ${JSON_FILE}"
