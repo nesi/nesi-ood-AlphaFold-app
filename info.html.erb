@@ -6,13 +6,11 @@ status_data = {}
 # Check if connection.yml file exists (connect API)
 if staged_root && File.exist?(staged_root.join('connection.yml')) 
   cpu_job_id = connect.CPU_JOB_ID
-  gpu_job_id = connect.GPU_JOB_ID
   run_dir = connect.RUN_DIR
   input_dir = connect.INPUT_DIR
   struct = connect.STRUCT
   logdir = connect.LOGDIR
   cpu_log_file = connect.CPU_LOG_FILE
-  gpu_log_file = connect.GPU_LOG_FILE
 
   # Read status.json file
   status_file = File.join(staged_root, connect.STATUS_FILE || "")

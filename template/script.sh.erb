@@ -57,6 +57,15 @@ echo "TIMING - Starting AlphaFold at: $(date)"
 ######################################################
 # Play around here
 
+export RUN_DIR=${WORKINGDIR}
+export INPUT_DIR="${RUN_DIR}/input"
+export STATUS_FILE=="status.json"
+export STRUCT="${RUN_DIR}/structure"
+export LOGDIR="${RUN_DIR}/logs"
+export CPU_LOG_FILE="${LOGDIR}/cpu_job.log"
+
+# ------------------------------------------
+
 INPUT_PATH=${WORKINGDIR}/input
 INPUT_JSON=${JSON_FILE}
 OUTPUT_DIR=${WORKINGDIR}/output
