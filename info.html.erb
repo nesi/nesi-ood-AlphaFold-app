@@ -10,9 +10,9 @@ if staged_root && File.exist?(staged_root.join('connection.yml'))
   cpu_log_file = connect.CPU_LOG_FILE
 
   # Read status.json file
-  status_file = File.join(staged_root, connect.STATUS_FILE || "")
+  #status_file = File.join(staged_root, connect.STATUS_FILE || "")
   #status_data = JSON.parse(File.read(status_file)) if File.exist?(status_file)
-  status_data =
+  status_data = false
 end
 
 # Extract information from status_data
