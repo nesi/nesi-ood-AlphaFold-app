@@ -1,6 +1,6 @@
 ---
 name: AlphaFold
-category: Chemistry/Biochemistry
+category: Biochemistry
 subcategory: Servers
 role: batch_connect
 description: |
