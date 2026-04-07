@@ -61,10 +61,14 @@ INPUT_PATH=${WORKINGDIR}/input
 OUTPUT_DIR=${WORKINGDIR}/output
 JAX_CACHE=${WORKINGDIR}/jax_cache
 
+echo INPUT_JSON=${INPUT_JSON}
+echo OUTPUT_DIR=${OUTPUT_DIR}
+echo JAX_CACHE=${JAX_CACHE}
+
 run_alphafold.py \
-  --json_path $INPUT_JSON \
-  --output_dir $OUTPUT_DIR \
-  --db_dir=$AF3DB \
+  --json_path ${INPUT_JSON} \
+  --output_dir ${OUTPUT_DIR} \
+  --db_dir=${AF3DB} \
   --num_diffusion_samples 5 \
   --run_data_pipeline true \
   --run_inference true \
