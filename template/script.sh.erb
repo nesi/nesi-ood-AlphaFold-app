@@ -60,6 +60,7 @@ echo "TIMING - Starting AlphaFold at: $(date)"
 INPUT_PATH=${WORKINGDIR}/input
 INPUT_JSON=${JSON_FILE}
 OUTPUT_DIR=${WORKINGDIR}/output
+INPUT_MODEL=/nesi/nobackup/nesi99999/geoffreyweal/alphafold_test/1lig-9/models
 JAX_CACHE=${WORKINGDIR}/jax_cache
 
 echo INPUT_JSON=${INPUT_JSON}
@@ -69,6 +70,7 @@ echo JAX_CACHE=${JAX_CACHE}
 run_alphafold.py \
   --json_path ${INPUT_JSON} \
   --output_dir ${OUTPUT_DIR} \
+  --model_dir ${INPUT_MODEL} \
   --db_dir=${AF3DB} \
   --num_diffusion_samples 5 \
   --run_data_pipeline true \
