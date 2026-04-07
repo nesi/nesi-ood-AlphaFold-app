@@ -5,10 +5,7 @@ status_data = {}
 
 # Check if connection.yml file exists (connect API)
 if staged_root && File.exist?(staged_root.join('connection.yml')) 
-  cpu_job_id = connect.CPU_JOB_ID
   run_dir = connect.RUN_DIR
-  input_dir = connect.INPUT_DIR
-  struct = connect.STRUCT
   logdir = connect.LOGDIR
   cpu_log_file = connect.CPU_LOG_FILE
 
@@ -29,7 +26,6 @@ end
 
 <%- if status_file && File.exist?(status_file) -%>
   <h5>Current Status</h5>
-  <p><strong>Job IDs:</strong> CPU = <%= cpu_job_id %> | GPU = <%= gpu_job_id %> 
     <a href="/pun/sys/dashboard/activejobs?jobcluster=all&jobfilter=user">View My Jobs <i class="fa fa-external-link"></i></a>
   </p>
   <p><strong>Run Directory:</strong> 
@@ -64,18 +60,5 @@ end
   </h6>
   <div style="max-height: 300px; overflow: auto; border: 1px solid #ddd; padding: 10px;">
     <pre style="white-space: pre; overflow-x: auto; font-size: 12px;"><%= escaped_cpu_log %></pre>
-  </div>
-<%- end -%>
-
-<%- if gpu_log_file && File.exist?(gpu_log_file) -%>
-<% escaped_gpu_log = File.read(gpu_log_file).lines.map { |line| line.start_with?('#') ? "\\#{line}" : line }.join %>
-  <h6>
-    <a href="/pun/sys/dashboard/files/fs<%= gpu_log_file %>" target="_blank">
-      GPU Phase Log
-      <i class="fa fa-external-link"></i>
-    </a>
-  </h6>
-  <div style="max-height: 300px; overflow: auto; border: 1px solid #ddd; padding: 10px;">
-    <pre style="white-space: pre; overflow-x: auto; font-size: 12px;"><%= escaped_gpu_log %></pre>
   </div>
 <%- end -%>
